@@ -1,212 +1,212 @@
-import { Component, AfterViewInit, OnDestroy, Input, signal } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
-import { RoutingService, RouteResult, RouteSummary } from '../services/routing';
+import { RoutingService } from '../services/routing';
 import { HikePoint } from '../services/hike';
+import { MatCardModule } from '@angular/material/card';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { RefugeInfoPtEau, RefugeInfoRefuge, RefugesInfoService } from '../services/refuges-info';
 
 @Component({
   selector: 'app-hike-map',
   standalone: true,
-  template: `<div id="hike-map" class="map-container">
-     <!-- Menu contextuel -->
-      @if (contextMenuVisible()) {
-      <div
-         [style.left.px]="contextMenuX()" 
-         [style.top.px]="contextMenuY()" 
-         class="context-menu">
-      <button (click)="onDeleteButtonClick(contextMenuMarkerId())">Supprimer</button>
-      <button (click)="onAddButtonClick(contextMenuMarkerCoordinates())">Ajouter</button>
-    </div>
-      }
-    
-  </div>
-  <h1>{{ (distance / 1000) | number:'1.2-2'}} km</h1>
-  <h1>{{positiveElevationGain}} m positif</h1>
-  <h1>{{negativeElevationGain}} m négatif</h1>`,
-  styles: [`
-  .map-container {
-     width: 100%; height: 800px;
-      }
-  .context-menu {
-      position: fixed;
-      background: white;
-      border: 1px solid #ccc;
-      z-index: 1000;
-      padding: 4px;
-      border-radius: 4px;
-    }
-    .context-menu button { cursor: pointer; }
-  `],
-  imports: [CommonModule]
+  templateUrl: './hike-map.html',
+  styleUrl: './hike-map.scss',
+  imports: [CommonModule, MatCardModule, MatGridListModule]
 })
 export class HikeMapComponent implements AfterViewInit, OnDestroy {
-
-  contextMenuVisible = signal(false)
-  contextMenuX = signal(0)
-  contextMenuY = signal(0)
+  // UI signals
+  contextMenuVisible = signal(false);
+  contextMenuX = signal(0);
+  contextMenuY = signal(0);
   contextMenuMarkerId = signal<number | null>(null);
   contextMenuMarkerCoordinates = signal<[number, number] | null>(null);
 
+  // Leaflet
   private map!: L.Map;
-  polyline?: L.Polyline;
+  private polyline?: L.Polyline;
   private leafletMarkers: L.Marker[] = [];
 
+  // Hike data
   points: HikePoint[] = [
-    {latitude: 45.621093, longitude: 6.052332, elevation: 0},
-    {latitude: 45.694522, longitude: 6.252326, elevation: 0},
-    {latitude: 45.755622, longitude: 6.252326, elevation: 0}
-  ]
-
+    { latitude: 45.621093, longitude: 6.052332, elevation: 0 },
+    { latitude: 45.694522, longitude: 6.352326, elevation: 0 },
+    { latitude: 45.755622, longitude: 6.552326, elevation: 0 },
+  ];
   positiveElevationGain = 0;
   negativeElevationGain = 0;
   distance = 0;
-  
-  constructor(private routing: RoutingService) {}
+  refuges: RefugeInfoRefuge[] = []
+  ptsEau: RefugeInfoPtEau[] = []
+
+  constructor(
+    private routing: RoutingService,
+    private refugesInfo: RefugesInfoService
+  ) {}
 
   ngAfterViewInit(): void {
     this.initMap();
     if (this.points.length > 0) {
-          
-            this.getRoute(this.points).then((result) => {
-              this.distance = result.summary.distance;
-              this.positiveElevationGain = result.summary.ascent;
-              this.negativeElevationGain = result.summary.descent;
-              this.drawRoute(result.points, true);
-              this.refreshMarkers();
-            })
-          
+      this.refreshRoute(true);
     }
   }
 
-  ngOnDestroy(): void { this.map?.remove(); }
+  ngOnDestroy(): void {
+    this.map?.remove();
+  }
 
-  private initMap() {
+  initMap(): void {
     this.map = L.map('hike-map', { center: [45.9, 6.85], zoom: 9 });
     this.map.on('contextmenu', (e) => this.showContextMenu(e, this.points.length));
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '© OpenStreetMap contributors'
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors',
     }).addTo(this.map);
 
-    // corriger les icônes par défaut
-    const iconRetinaUrl = 'assets/marker-icon-2x.png';
-    const iconUrl = 'assets/marker-icon.png';
-    const shadowUrl = 'assets/marker-shadow.png';
-
-    L.Marker.prototype.options.icon = L.icon({
-      iconRetinaUrl,
-      iconUrl,
-      shadowUrl,
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41],
-    });
+    // default marker icons
+    L.Marker.prototype.options.icon = this.getMarkerIcon('default');
   }
 
-  private refreshMarkers() {
-    if (this.leafletMarkers.length > 0) {
-      this.leafletMarkers.forEach((marker) => marker.removeFrom(this.map))
-      this.leafletMarkers = []
+  getMarkerIcon(type: 'start' | 'end' | 'default' | 'refuge' | 'pt_eau'): L.Icon {
+  const urls: Record<typeof type, string> = {
+    start: 'assets/marker-icon.png',
+    end: 'assets/marker-icon.png',
+    default: 'assets/marker-icon.png',
+    refuge: 'assets/refuge.png',
+    pt_eau: 'assets/robinet.png'
+  };
+
+  const isCustomSvg = type === 'refuge' || type === 'pt_eau';
+
+  return L.icon({
+    iconUrl: urls[type],
+    shadowUrl: !isCustomSvg ? 'assets/marker-shadow.png' : undefined,
+    iconSize: isCustomSvg ? [32, 32] : [25, 41],
+    iconAnchor: isCustomSvg ? [12, 12] : [12, 41],
+    popupAnchor: isCustomSvg ? [0, -12] : [1, -34],
+    shadowSize: !isCustomSvg ? [41, 41] : undefined,
+  });
+}
+
+  async refreshRoute(zoomOut: boolean): Promise<void> {
+    if (this.points.length < 2) {
+      this.clearRoute();
+      return;
     }
-    this.points.forEach((point, index) => {
-      let marker = this.createDraggableMarker(index)
-      this.leafletMarkers.push(marker)
-    })
-  }
 
-  onAddButtonClick(coordinates: [number, number] | null) {
-    this.addPoint(coordinates);
-    this.contextMenuVisible.set(false);
-    this.getRoute(this.points).then((result) => {
-      this.drawRoute(result.points, false);
-      this.distance = result.summary.distance;
-      this.positiveElevationGain = result.summary.ascent;
-      this.negativeElevationGain = result.summary.descent;
-    });
-  }
+    const result = await this.routing.getRoute(this.points);
+    const mappedPoints: HikePoint[] = result.geometry.map(([lat, lng, el]) => ({
+      latitude: lat,
+      longitude: lng,
+      elevation: el,
+    }));
+    
+    this.distance = result.summary.distance;
+    this.positiveElevationGain = result.summary.ascent;
+    this.negativeElevationGain = result.summary.descent;
+    this.refuges = []
+    this.ptsEau = []
 
-  onDeleteButtonClick(id: number | null) {
-    if (id === null) return;
-    this.deletePoint(id);
-
-    if (this.points.length > 1) {
-      this.getRoute(this.points).then((result) => {
-        this.drawRoute(result.points, false)
-        this.distance = result.summary.distance;
-        this.positiveElevationGain = result.summary.ascent;
-        this.negativeElevationGain = result.summary.descent;
-      });
-    } else {
-      this.drawRoute(this.points, false);
-      this.distance = 0;
-      this.positiveElevationGain = 0;
-      this.negativeElevationGain = 0;
-    }
-    this.contextMenuVisible.set(false);
-  }
-
-  deletePoint(id: number) { 
-    this.points = this.points.filter((point, index) =>  {
-          return (id !== index)
-    })
+    this.drawRoute(mappedPoints, zoomOut);
     this.refreshMarkers();
+    this.loadNearbyRefuges(mappedPoints);
   }
 
-  addPoint(coordinates: [number, number] | null) {
-    if (coordinates != null) {
-      let point: HikePoint = {
-        latitude: coordinates[0],
-        longitude: coordinates[1],
-        elevation: 0
-      }
-      
-      let minimalSegmentIndex = -1;
-      let minimalDistance = null;
+  clearRoute(): void {
+    this.polyline?.remove();
+    this.refreshMarkers();
+    this.distance = 0;
+    this.positiveElevationGain = 0;
+    this.negativeElevationGain = 0;
+    this.refuges = []
+    this.ptsEau = []
+  }
 
-      for (let i = 0; i < this.points.length - 1; i++) {
-        let pointOnSegmentProjectionCoords = this.projectPointOnSegment(
-          [coordinates[0], coordinates[1]],
-          [this.points[i].latitude, this.points[i].longitude],
-          [this.points[i+1].latitude, this.points[i+1].latitude]
-         )
+  drawRoute(points: HikePoint[], zoomOut: boolean): void {
+    const coords = points.map((c) => [c.latitude, c.longitude]) as [number, number][];
+    this.polyline?.remove();
+    this.polyline = L.polyline(coords, { color: 'blue', weight: 1 }).addTo(this.map);
+    if (zoomOut) this.map.fitBounds(coords);
+  }
 
-         let clickedPoint = L.latLng(coordinates[0], coordinates[1]);
-         let pointOnSegment = L.latLng(pointOnSegmentProjectionCoords[0], pointOnSegmentProjectionCoords[1]);
-         
-         let distance = clickedPoint.distanceTo(pointOnSegment);
+  refreshMarkers(): void {
+    this.leafletMarkers.forEach((m) => m.removeFrom(this.map));
+    this.leafletMarkers = this.points.map((_, i) => this.createMarker(i));
+  }
 
-         if (minimalDistance == null) {
-          minimalDistance = distance
-          minimalSegmentIndex = i;
-         } else {
-          if (distance < minimalDistance) {
-            minimalDistance = distance
-            minimalSegmentIndex = i;
+  createMarker(index: number): L.Marker {
+    const point = this.points[index];
+    const icon =
+      index === 0
+        ? this.getMarkerIcon('start')
+        : index === this.points.length - 1
+        ? this.getMarkerIcon('end')
+        : this.getMarkerIcon('default');
+
+    return L.marker([point.latitude, point.longitude], { draggable: true, icon })
+      .addTo(this.map)
+      .bindPopup(index === 0 ? 'Départ' : index === this.points.length - 1 ? 'Arrivée' : `Point ${index + 1}`)
+      .on('dragend', (e) => this.onMarkerDragEnd(e, index))
+      .on('contextmenu', (e) => this.showContextMenu(e, index));
+  }
+
+  onMarkerDragEnd(e: L.DragEndEvent, index: number): void {
+    const { lat, lng } = (e.target as L.Marker).getLatLng();
+    this.points[index] = { ...this.points[index], latitude: lat, longitude: lng };
+    this.refreshRoute(false);
+  }
+
+  async loadNearbyRefuges(points: HikePoint[]): Promise<void> {
+    const bbox = this.refugesInfo.createBbox(points);
+    const response = await this.refugesInfo.getDataFromBbox(bbox.min, bbox.max);
+    const addedCoords = new Set<string>();
+
+    for (const feature of response.features) {
+      const [lng, lat] = feature.geometry.coordinates;
+      let isNear = false;
+
+      for (let i = 0; i < points.length - 1; i++) {
+        const projection = this.refugesInfo.projectPointOnSegment(
+          [lat, lng],
+          [points[i].latitude, points[i].longitude],
+          [points[i + 1].latitude, points[i + 1].longitude]
+        );
+
+        const distance = L.latLng(lat, lng).distanceTo(L.latLng(projection[0], projection[1]));
+        if (distance < 1000) {
+          isNear = true;
+
+          let item = {name: feature.properties.nom, link: feature.properties.lien}
+
+          if (feature.properties.type.id === 23) {
+            this.ptsEau.push(item)
+          } else {
+            this.refuges.push(item)
           }
-         }
-         //console.log("distance: " + distance)
-         //console.log("minimaldistance: " + minimalDistance);
-         //console.log("minimalsegmentIndex: " + minimalSegmentIndex)
-      } 
+          break;
+        }
+      }
 
-      //console.log(minimalSegmentIndex);
-      
-      this.points.splice(minimalSegmentIndex + 1, 0, point);
-      
+      if (isNear) {
+        const key = `${lat.toFixed(5)},${lng.toFixed(5)}`;
+        if (addedCoords.has(key)) continue;
+        addedCoords.add(key);
 
-      this.refreshMarkers();
+        const typeIcon = feature.properties.type.id === 23 ? 'pt_eau' : 'refuge';
+        this.leafletMarkers.push(L.marker([lat, lng], { icon: this.getMarkerIcon(typeIcon) }).addTo(this.map));
+      }
     }
   }
 
-  private showContextMenu(e: L.LeafletMouseEvent, id: number): void {
-    this.contextMenuX.set(e.originalEvent.clientX);
-    this.contextMenuY.set(e.originalEvent.clientY);
+  showContextMenu(e: L.LeafletMouseEvent, id: number): void {
+    const rect = this.map.getContainer().getBoundingClientRect();
+    this.contextMenuX.set(e.originalEvent.clientX - rect.left);
+    this.contextMenuY.set(e.originalEvent.clientY - rect.top);
     this.contextMenuMarkerId.set(id);
-    this.contextMenuMarkerCoordinates.set([e.latlng.lat, e.latlng.lng])
+    this.contextMenuMarkerCoordinates.set([e.latlng.lat, e.latlng.lng]);
     this.contextMenuVisible.set(true);
 
-    // clic ailleurs ferme le menu
     const close = () => {
       this.contextMenuVisible.set(false);
       window.removeEventListener('click', close);
@@ -214,103 +214,38 @@ export class HikeMapComponent implements AfterViewInit, OnDestroy {
     window.addEventListener('click', close);
   }
 
-  private createDraggableMarker(index: number): L.Marker {
-    return L.marker([this.points[index].latitude, this.points[index].longitude], { draggable: true })
-    .addTo(this.map)
-    .on('dragend', (e) => this.onMarkerDragEnd(e, index))
-    .on('contextmenu', (e) => this.showContextMenu(e, index));
+  onAddButtonClick(coords: [number, number] | null): void {
+    if (!coords) return;
+    this.addPoint(coords);
+    this.contextMenuVisible.set(false);
+    this.refreshRoute(false);
   }
 
-  private onMarkerDragEnd(e: L.DragEndEvent, index: number): void {
-    const { lat, lng } = (e.target as L.Marker).getLatLng();
-    this.updatePoint(index, [lat, lng]);
-    this.getRoute(this.points).then((result) => {
-      this.drawRoute(result.points, false)
-      this.distance = result.summary.distance;
-      this.positiveElevationGain = result.summary.ascent;
-      this.negativeElevationGain = result.summary.descent;
-    });
+  onDeleteButtonClick(id: number | null): void {
+    if (id === null) return;
+    this.points = this.points.filter((_, i) => i !== id);
+    this.contextMenuVisible.set(false);
+    this.refreshRoute(false);
   }
 
-  private updatePoint(index: number, newPosition: [number, number]) {
-    this.points[index].latitude = newPosition[0];
-    this.points[index].longitude = newPosition[1];
-  }
+  addPoint(coords: [number, number]): void {
+    const newPoint: HikePoint = { latitude: coords[0], longitude: coords[1], elevation: 0 };
+    let bestIndex = 0, bestDist = Infinity;
 
-  private async getRoute(points: HikePoint[]): Promise<RouteResult> {
-    const result = await this.routing.getRoute(points);
-    
-    const mappedPoints: HikePoint[] = result.geometry.map(
-      ([lat, lng, el]) => ({
-        latitude: lat,
-        longitude: lng,
-        elevation: el,
-      })
-    );
-  
-    const summary: RouteSummary = {
-      distance: result.summary.distance,
-      ascent: result.summary.ascent,
-      descent: result.summary.descent,
-    };
-  
-    return { points: mappedPoints, summary };
-  }
-
-  private async drawRoute(points: HikePoint[], zoomOut: boolean) {
-
-    // On met au format [latitude, longitude] pour Leaflet
-    const coords: [number, number][] = points.map(
-      (c: HikePoint) => [c.latitude, c.longitude]
-    );
-
-    // Tracé
-    this.polyline?.remove();
-    this.polyline = L.polyline(coords, { color: 'red', weight: 2 }).addTo(this.map);
-
-    if (zoomOut) {
-      // Ajuste le zoom pour voir tout le tracé
-      this.map.fitBounds(coords);
+    for (let i = 0; i < this.points.length - 1; i++) {
+      const projection = this.refugesInfo.projectPointOnSegment(
+        coords,
+        [this.points[i].latitude, this.points[i].longitude],
+        [this.points[i + 1].latitude, this.points[i + 1].longitude]
+      );
+      const dist = L.latLng(coords[0], coords[1]).distanceTo(L.latLng(projection[0], projection[1]));
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIndex = i;
+      }
     }
+
+    this.points.splice(bestIndex + 1, 0, newPoint);
+    this.refreshMarkers();
   }
-
-  /** 
- * Retourne la projection du point p sur le segment [a,b].
- * Entrées et sorties sont dans le même repère.
- */
-private projectPointOnSegment(
-  p: [number, number],
-  a: [number, number],
-  b: [number, number]
-): [number, number] {
-  const [px, py] = p;
-  const [ax, ay] = a;
-  const [bx, by] = b;
-
-  // vecteur AB et AP
-  const abx = bx - ax;
-  const aby = by - ay;
-  const apx = px - ax;
-  const apy = py - ay;
-
-  // norme au carré de AB
-  const ab2 = abx * abx + aby * aby;
-  if (ab2 === 0) {
-    // A et B confondus -> segment de longueur 0, retourner A
-    return [ax, ay];
-  }
-
-  // paramètre t (position de la projection sur la droite AB)
-  let t = (apx * abx + apy * aby) / ab2;
-
-  // clamp t dans [0, 1] pour rester dans le segment
-  if (t < 0) t = 0;
-  if (t > 1) t = 1;
-
-  // coordonnées de la projection Q
-  const qx = ax + t * abx;
-  const qy = ay + t * aby;
-
-  return [qx, qy];
-}
 }

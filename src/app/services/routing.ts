@@ -27,6 +27,7 @@ export class RoutingService {
 
   async getRoute(points: HikePoint[]): Promise<RouteResponse> {
     const response = await axios.post(this.direction_api_url, {
+      "preference": "recommended",
       "coordinates": points.map((hikepoint) => [hikepoint.longitude, hikepoint.latitude]),
       "elevation": true
     },

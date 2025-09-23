@@ -1,1 +1,47 @@
-<p>hike-map works!</p>
+<div class="hike-layout">
+  <!-- Carte -->
+  <div id="hike-map" class="map-container">
+    @if (contextMenuVisible()) {
+      <div
+        [style.left.px]="contextMenuX()" 
+        [style.top.px]="contextMenuY()" 
+        class="context-menu">
+        <button mat-raised-button color="primary" (click)="onAddButtonClick(contextMenuMarkerCoordinates())">Ajouter</button>
+        <button mat-raised-button color="warn" (click)="onDeleteButtonClick(contextMenuMarkerId())">Supprimer</button>
+        <button mat-raised-button color="accent">Supprimer tous les points</button>
+      </div>
+    }
+  </div>
+
+    <div class="hike-infos">
+      <div class="hike-summary">
+        <h2>Résumé de la randonnée</h2>
+        <ul>
+          <li>Distance : {{ (distance / 1000) | number:'1.0-0' }} km</li>
+          <li>Dénivelé positif : {{ positiveElevationGain | number: '1.0-0' }} m</li>
+          <li>Dénivelé négatif : {{ negativeElevationGain | number: '1.0-0'}} m</li>
+        </ul>
+      </div>
+
+
+      <div>
+        <h2>Refuges</h2>
+        @for (refuge of refuges; track $index) {
+          <div class="item--refuge">
+            <p>{{refuge.name}}</p>
+            <a [href]="refuge.link" target="_blank" class="button-3">Lien</a>
+          </div>
+        }
+      </div>
+
+      <div>
+        <h2>Point d'eau</h2>
+        @for (ptEau of ptsEau; track $index) {
+          <div class="item--ptEau">
+            <p>{{ptEau.name}}</p>
+            <a [href]="ptEau.link" target="_blank" class="button-3">Lien</a>
+          </div>
+        }
+      </div>
+    </div>
+</div>
