@@ -1,5 +1,9 @@
+<div class="hike-actions">
+  <button class='button-3' [routerLink]="['/list']">Retour</button>
+  <button class='button-3' (click)="onSaveButtonClick()">Sauvegarder</button>
+</div>
+
 <div class="hike-layout">
-  <!-- Carte -->
   <div id="hike-map" class="map-container">
     @if (contextMenuVisible()) {
       <div
@@ -17,9 +21,9 @@
       <div class="hike-summary">
         <h2>Résumé de la randonnée</h2>
         <ul>
-          <li>Distance : {{ (distance / 1000) | number:'1.0-0' }} km</li>
-          <li>Dénivelé positif : {{ positiveElevationGain | number: '1.0-0' }} m</li>
-          <li>Dénivelé négatif : {{ negativeElevationGain | number: '1.0-0'}} m</li>
+          <li>Distance : {{ ( currentHike.distance / 1000) | number:'1.0-0' }} km</li>
+          <li>Dénivelé positif : {{ currentHike.positiveElevationGain | number: '1.0-0' }} m</li>
+          <li>Dénivelé négatif : {{ currentHike.negativeElevationGain | number: '1.0-0'}} m</li>
         </ul>
       </div>
 

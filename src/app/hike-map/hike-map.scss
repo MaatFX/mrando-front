@@ -1,18 +1,25 @@
+.hike-actions {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+}
+
+.hike-actions button {
+  margin-right: 0.5rem;
+}
 .hike-layout {
   display: flex;
   height: 100vh;
 }
 
-/* Carte */
 .map-container {
   flex: 2;
   height: 100%;
   border-radius: 8px;
   overflow: hidden;
-  position: relative; /* pour le menu contextuel */
+  position: relative;
 }
 
-/* CSS */
 .button-3 {
   appearance: none;
   background-color: #2ea44f;
@@ -68,12 +75,11 @@
   margin: 1rem;
 }
 
-/* Résumé */
 .hike-summary {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* résumé aligné en haut */
+  justify-content: flex-start;
   background: #f9f9f9;
   border-radius: 8px;
 }
@@ -95,7 +101,6 @@
   font-size: 1rem;
 }
 
-/* Menu contextuel */
 .context-menu {
   position: absolute;
   background: white;
@@ -107,7 +112,6 @@
   gap: 0.5rem;
   pointer-events: auto;
 
-  /* Optionnel : ajouter un léger décalage pour que le menu ne cache pas le curseur */
   transform: translate(10px, 10px);
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   border-radius: 4px;
@@ -126,7 +130,6 @@
   flex-grow: 1;
 }
 
-/* Responsive : pile sur mobile */
 @media (max-width: 768px) {
   .hike-layout {
     flex-direction: column;

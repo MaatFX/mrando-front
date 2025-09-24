@@ -16,6 +16,7 @@ export type HikePoint = {
   latitude: number;
   longitude: number;
   elevation: number;
+  index: number;
 }
 
 @Injectable({
@@ -29,7 +30,19 @@ export class HikeService {
     return this.http.get<Hike[]>(this.apiUrl);
   }
 
+  getHikeById(id: number): Observable<Hike> {
+    return this.http.get<Hike>(this.apiUrl + `/${id}`);
+  }
+
+  updateHikeById(id: number, data: Hike): Observable<Hike> {
+    return this.http.put<Hike>(`${this.apiUrl}/${id}`, data);
+  }
+ 
   deleteHike(id: number): Observable<Hike> {
     return this.http.delete<Hike>(this.apiUrl + `/${id}`);
+  }
+
+  createHike(data: Hike): Observable<Hike> {
+    return this.http.post<Hike>(this.apiUrl, data)
   }
 }
