@@ -1,51 +1,92 @@
+<!-- Actions principales -->
 <div class="hike-actions">
-  <button class='button-3' [routerLink]="['/list']">Retour</button>
-  <button class='button-3' (click)="onSaveButtonClick()">Sauvegarder</button>
+  <button mat-stroked-button color="primary" [routerLink]="['/list']">Retour</button>
+  <button mat-flat-button color="accent" (click)="onSaveButtonClick()">Sauvegarder</button>
 </div>
 
 <div class="hike-layout">
+  <!-- Carte -->
   <div id="hike-map" class="map-container">
     @if (contextMenuVisible()) {
       <div
-        [style.left.px]="contextMenuX()" 
-        [style.top.px]="contextMenuY()" 
-        class="context-menu">
-        <button mat-raised-button color="primary" (click)="onAddButtonClick(contextMenuMarkerCoordinates())">Ajouter</button>
-        <button mat-raised-button color="warn" (click)="onDeleteButtonClick(contextMenuMarkerId())">Supprimer</button>
-        <button mat-raised-button color="accent">Supprimer tous les points</button>
-      </div>
+    [style.left.px]="contextMenuX()" 
+    [style.top.px]="contextMenuY()" 
+    class="context-menu">
+    
+    <button mat-button color="primary" (click)="onAddButtonClick(contextMenuMarkerCoordinates())">
+      <mat-icon>add</mat-icon>
+      <span class="menu-label">Ajouter</span>
+    </button>
+
+    <button mat-button color="warn" (click)="onDeleteButtonClick(contextMenuMarkerId())">
+      <mat-icon>delete</mat-icon>
+      <span class="menu-label">Supprimer</span>
+    </button>
+
+    <button mat-button color="accent">
+      <mat-icon>clear_all</mat-icon>
+      <span class="menu-label">Tout supprimer</span>
+    </button>
+  </div>
     }
   </div>
 
-    <div class="hike-infos">
-      <div class="hike-summary">
-        <h2>Résumé de la randonnée</h2>
-        <ul>
-          <li>Distance : {{ ( currentHike.distance / 1000) | number:'1.0-0' }} km</li>
-          <li>Dénivelé positif : {{ currentHike.positiveElevationGain | number: '1.0-0' }} m</li>
-          <li>Dénivelé négatif : {{ currentHike.negativeElevationGain | number: '1.0-0'}} m</li>
-        </ul>
-      </div>
+  <!-- Sidebar infos -->
+  <div class="hike-infos">
+    <!-- Résumé de la randonnée -->
+    <mat-card class="hike-summary-card">
+  <mat-card-header>
+    <mat-card-title class="no-bold">Résumé de la randonnée</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <mat-list>
+      <mat-list-item>
+        <div matLine>{{ (currentHike.distance / 1000) | number:'1.0-0' }} km</div>
+        <div matLine class="secondary">Distance</div>
+      </mat-list-item>
+
+      <mat-list-item>
+        <div matLine>{{ currentHike.positiveElevationGain | number:'1.0-0' }} m</div>
+        <div matLine class="secondary">Dénivelé positif</div>
+      </mat-list-item>
+
+      <mat-list-item>
+        <div matLine>{{ currentHike.negativeElevationGain | number:'1.0-0' }} m</div>
+        <div matLine class="secondary">Dénivelé négatif</div>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+</mat-card>
 
 
-      <div>
-        <h2>Refuges</h2>
+    <!-- Refuges avec accordéon -->
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Refuges</mat-panel-title>
+        </mat-expansion-panel-header>
         @for (refuge of refuges; track $index) {
-          <div class="item--refuge">
-            <p>{{refuge.name}}</p>
-            <a [href]="refuge.link" target="_blank" class="button-3">Lien</a>
+          <div class="item-refuge">
+            <span>{{ refuge.name }}</span>
+            <a mat-button color="primary" [href]="refuge.link" target="_blank">Lien</a>
           </div>
         }
-      </div>
-
-      <div>
-        <h2>Point d'eau</h2>
+      </mat-expansion-panel>
+    </mat-accordion>
+      <!-- Points d'eau avec accordéon -->
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Points d'eau</mat-panel-title>
+        </mat-expansion-panel-header>
         @for (ptEau of ptsEau; track $index) {
-          <div class="item--ptEau">
-            <p>{{ptEau.name}}</p>
-            <a [href]="ptEau.link" target="_blank" class="button-3">Lien</a>
+          <div class="item-ptEau">
+            <span>{{ ptEau.name }}</span>
+            <a mat-button color="primary" [href]="ptEau.link" target="_blank">Lien</a>
           </div>
         }
-      </div>
-    </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
 </div>

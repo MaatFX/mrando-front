@@ -5,15 +5,18 @@ import { RoutingService } from '../services/routing';
 import { Hike, HikePoint, HikeService } from '../services/hike';
 import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
 import { RefugeInfoPtEau, RefugeInfoRefuge, RefugesInfoService } from '../services/refuges-info';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatListItem, MatListModule } from "@angular/material/list";
 @Component({
   selector: 'app-hike-map',
-  standalone: true,
   templateUrl: './hike-map.html',
   styleUrl: './hike-map.scss',
-  imports: [CommonModule, MatCardModule, MatGridListModule, RouterModule]
+  imports: [CommonModule, MatCardModule, MatGridListModule, RouterModule, MatAccordion, MatExpansionModule, MatButtonModule, MatIcon, MatListItem, MatListModule]
 })
 export class HikeMapComponent implements AfterViewInit, OnDestroy, OnInit {
   // UI signals
@@ -37,7 +40,8 @@ export class HikeMapComponent implements AfterViewInit, OnDestroy, OnInit {
     private routing: RoutingService,
     private refugesInfo: RefugesInfoService,
     private hikeService: HikeService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -246,10 +250,16 @@ export class HikeMapComponent implements AfterViewInit, OnDestroy, OnInit {
 
     this.hikeService.updateHikeById(this.currentHike.id, this.currentHike).subscribe({
       next: (hike) => {
-        console.log('Mise à jour réussie ✅', hike);
+        this.snackBar.open('Randonnée sauvegardée avec succès ✅', 'Fermer', {
+        duration: 3000,
+        panelClass: ['snackbar-success']
+      });
       },
       error: (err) => {
-        console.error('Erreur de mise à jour ❌', err);
+        this.snackBar.open('Erreur lors de la sauvegarde ❌', 'Fermer', {
+        duration: 3000,
+        panelClass: ['snackbar-error']
+      });
       }
     })
 }

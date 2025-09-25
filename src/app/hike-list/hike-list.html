@@ -1,0 +1,77 @@
+<section class="hike-list-container">
+  <h2 class="hike-list-title">Randonnées</h2>
+
+  <!-- Création -->
+  <div class="create-hike-header">
+    <button mat-flat-button color="primary" (click)="showForm.set(!showForm())">
+      <mat-icon>{{ showForm() ? 'close' : 'add' }}</mat-icon>
+      {{ showForm() ? 'Annuler' : 'Nouvelle randonnée' }}
+    </button>
+  </div>
+
+  @if(showForm()) {
+    <mat-card class="new-hike-card">
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="">
+          <mat-label>Nom de la randonnée</mat-label>
+          <input matInput [(ngModel)]="newHike.name">
+        </mat-form-field>
+        <div class="form-actions">
+          <button mat-stroked-button (click)="showForm.set(false)">Annuler</button>
+          <button mat-flat-button color="accent" (click)="createHike()">Créer</button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Messages -->
+  @if(loading()) {
+    <div class="state-message">
+      <span>Chargement des randonnées...</span>
+    </div>
+  } @else if(error()) {
+    <div class="state-message error">
+      <mat-icon>error</mat-icon>
+      <span>Erreur lors du chargement.</span>
+    </div>
+  }
+
+  <!-- Liste -->
+  @if(!loading() && !error() && hikes().length > 0) {
+    <div class="hike-grid">
+      @for(hike of hikes(); track hike.id) {
+        <mat-card class="hike-card" (click)="onHikeCardClicked(hike.id)">
+            <mat-card-header>
+                <div class="hike-header">
+                    <mat-card-title>{{ hike.name }}</mat-card-title>
+                        <button mat-icon-button color="warn" (click)="confirmDelete(hike); $event.stopPropagation()">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                </div>
+            </mat-card-header>
+
+          <mat-card-content>
+            <div class="hike-info">
+              <div class="hike-info-item">
+                <mat-icon>trending_up</mat-icon>
+                <span>{{ hike.positiveElevationGain | number:'1.0-0' }} m D+</span>
+              </div>
+              <div class="hike-info-item">
+                <mat-icon>trending_down</mat-icon>
+                <span>{{ hike.negativeElevationGain | number:'1.0-0' }} m D-</span>
+              </div>
+              <div class="hike-info-item">
+                <mat-icon>straighten</mat-icon>
+                <span>{{ (hike.distance / 1000) | number:'1.0-0' }} km</span>
+              </div>
+              <div class="hike-info-item">
+                <mat-icon>schedule</mat-icon>
+                <span>{{ hike.duration }} min</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+</section>

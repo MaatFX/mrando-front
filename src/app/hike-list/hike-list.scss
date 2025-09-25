@@ -1,0 +1,75 @@
+.hike-list-container {
+  padding: 16px;
+}
+
+.create-hike-header {
+  margin: 16px 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.new-hike-form {
+  gap: 12px;
+  align-items: center;
+}
+
+.new-hike-card {
+  width: fit-content;
+  margin-bottom: 16px;
+}
+
+.form-actions button {
+  margin-right: 8px;
+}
+
+.hike-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  mat-card-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+}
+
+.full-width {
+  flex: 1;
+}
+
+.hike-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.hike-card {
+  cursor: pointer;
+  transition: box-shadow 0.2s ease-in-out;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+}
+
+.hike-info {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.hike-info-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.loading-text,
+.error-text {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.95rem;
+}

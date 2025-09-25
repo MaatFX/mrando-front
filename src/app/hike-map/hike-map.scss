@@ -1,146 +1,108 @@
-.hike-actions {
-  display: flex;
-  flex-direction: row;
-  padding: 1rem;
-}
-
-.hike-actions button {
-  margin-right: 0.5rem;
-}
+/* Conteneur principal : carte + sidebar */
 .hike-layout {
   display: flex;
-  height: 100vh;
+  flex-direction: row;
+  gap: 16px;
+  margin: 16px;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+  }
 }
 
+/* Carte */
 .map-container {
   flex: 2;
-  height: 100%;
+  height: 800px;
   border-radius: 8px;
   overflow: hidden;
   position: relative;
 }
 
-.button-3 {
-  appearance: none;
-  background-color: #2ea44f;
-  border: 1px solid rgba(27, 31, 35, .15);
-  border-radius: 6px;
-  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
-  box-sizing: border-box;
-  color: #fff;
-  cursor: pointer;
-  display: inline-block;
-  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 20px;
-  padding: 4px 12px;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-
-.button-3:focus:not(:focus-visible):not(.focus-visible) {
-  box-shadow: none;
-  outline: none;
-}
-
-.button-3:hover {
-  background-color: #2c974b;
-}
-
-.button-3:focus {
-  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
-  outline: none;
-}
-
-.button-3:disabled {
-  background-color: #94d3a2;
-  border-color: rgba(27, 31, 35, .1);
-  color: rgba(255, 255, 255, .8);
-  cursor: default;
-}
-
-.button-3:active {
-  background-color: #298e46;
-  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
-}
-
+/* Sidebar informations */
 .hike-infos {
-  margin: 1rem;
-}
-
-.hike-summary {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  background: #f9f9f9;
+  gap: 16px;
+}
+
+/* Résumé de la randonnée et autres cards */
+.hike-summary,
+.hike-refuges,
+.hike-water {
+  background-color: #fff;
+  padding: 16px;
   border-radius: 8px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+  font-weight: normal; /* pas de gras */
 }
 
-.hike-summary h2 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.3rem;
+/* Items dans Refuges / Points d’eau */
+.item-refuge,
+.item-ptEau {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
-.hike-summary ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+/* Boutons dans le menu contextuel */
+.context-menu {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.25);
+  z-index: 1000;
 }
 
-.hike-summary li {
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
+/* Actions principales */
+.hike-actions {
+  display: flex;
+  margin: 16px;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-bottom: 16px;
 }
 
 .context-menu {
-  position: absolute;
-  background: white;
-  border: 1px solid #ccc;
-  z-index: 1000;
-  padding: 0.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  pointer-events: auto;
-
-  transform: translate(10px, 10px);
+  background: white;
+  border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  border-radius: 4px;
+  padding: 4px;
+  gap: 4px;
+  min-width: 160px;
 }
 
-.item--refuge, .item--ptEau {
+.context-menu button {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 0.5rem;
+  justify-content: flex-start;
+  text-align: left;
+  font-size: 14px;
+  padding: 4px 8px;
 }
 
-.item--refuge p, .item--ptEau p {
-  margin-right: 0.5rem;
-  flex-grow: 1;
+.context-menu mat-icon {
+  margin-right: 8px;
+  font-size: 18px;
 }
 
-@media (max-width: 768px) {
-  .hike-layout {
-    flex-direction: column;
-  }
+.hike-summary-card {
+  margin-bottom: 16px;
+}
 
-  .map-container {
-    height: 400px;
-  }
+mat-list-item {
+  font-size: 14px;
+}
 
-  .hike-summary {
-    width: 100%;
-    margin-top: 1rem;
-  }
+.secondary {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
 }
