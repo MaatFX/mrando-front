@@ -171,11 +171,11 @@ export class HikeMapComponent implements AfterViewInit, OnDestroy, OnInit {
 
   async loadNearbyRefuges(points: HikePoint[]): Promise<void> {
     const bbox = this.refugesInfo.createBbox(points);
-    const response = await this.refugesInfo.getDataFromBbox(bbox.min, bbox.max);
+    const response = await this.refugesInfo.getDataFromBbox(bbox.min[1], bbox.min[0], bbox.max[1], bbox.max[0]);
     const addedCoords = new Set<string>();
 
-    for (const feature of response.features) {
-      const [lng, lat] = feature.geometry.coordinates;
+    for (const data of response.features) {
+      const [lng, lat] = data.geometry.coordinates;
       let isNear = false;
 
       for (let i = 0; i < points.length - 1; i++) {
@@ -189,9 +189,9 @@ export class HikeMapComponent implements AfterViewInit, OnDestroy, OnInit {
         if (distance < 1000) {
           isNear = true;
 
-          let item = {name: feature.properties.nom, link: feature.properties.lien}
+          let item = {name: data.properties.nom, link: data.properties.lien}
 
-          if (feature.properties.type.id === 23) {
+          if (data.properties.type.id === 23) {
             this.ptsEau.push(item)
           } else {
             this.refuges.push(item)
@@ -205,7 +205,7 @@ export class HikeMapComponent implements AfterViewInit, OnDestroy, OnInit {
         if (addedCoords.has(key)) continue;
         addedCoords.add(key);
 
-        const typeIcon = feature.properties.type.id === 23 ? 'pt_eau' : 'refuge';
+        const typeIcon = data.properties.type.id === 23 ? 'pt_eau' : 'refuge';
         this.leafletMarkers.push(L.marker([lat, lng], { icon: this.getMarkerIcon(typeIcon) }).addTo(this.map));
       }
     }
