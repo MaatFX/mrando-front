@@ -28,7 +28,6 @@ export class RefugesInfoService {
     const url = `${this.apiUrl}?minLongitude=${minLng}&minLatitude=${minLat}&maxLongitude=${maxLng}&maxLatitude=${maxLat}`;
 
     const response = await axios.get(url);
-    //console.log(data)
 
     return response.data;
   }

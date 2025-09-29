@@ -172,6 +172,7 @@ export class HikeMapComponent implements AfterViewInit, OnDestroy, OnInit {
   async loadNearbyRefuges(points: HikePoint[]): Promise<void> {
     const bbox = this.refugesInfo.createBbox(points);
     const response = await this.refugesInfo.getDataFromBbox(bbox.min[1], bbox.min[0], bbox.max[1], bbox.max[0]);
+    console.log(response.features.length)
     const addedCoords = new Set<string>();
 
     for (const data of response.features) {
@@ -190,8 +191,10 @@ export class HikeMapComponent implements AfterViewInit, OnDestroy, OnInit {
           isNear = true;
 
           let item = {name: data.properties.nom, link: data.properties.lien}
+          //console.log(item)
 
           if (data.properties.type.id === 23) {
+            //console.log(data.properties.type.id)
             this.ptsEau.push(item)
           } else {
             this.refuges.push(item)
