@@ -73,7 +73,7 @@
               "sourceMap": true
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "prod"
         },
         "serve": {
           "options": {
@@ -85,13 +85,13 @@
               "buildTarget": "mrando-front:build:production"
             },
             "dev": {
-              "buildTarget": "mrando-front:build:development"
+              "buildTarget": "mrando-front:build:dev"
             },
             "staging": {
-              "buildTarget": "mrando-front:build:development"
+              "buildTarget": "mrando-front:build:dev"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "dev"
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"

@@ -13,10 +13,15 @@
     [style.top.px]="contextMenuY()" 
     class="context-menu">
     
-    <button mat-button color="primary" (click)="onAddButtonClick(contextMenuMarkerCoordinates())">
+    <button mat-button color="primary" (click)="onAddButtonClick(contextMenuMarkerCoordinates(), false)">
       <mat-icon>add</mat-icon>
-      <span class="menu-label">Ajouter</span>
+      <span class="menu-label">Ajouter en tant que point de passage</span>
     </button>
+
+    <button mat-button color="primary" (click)="onAddButtonClick(contextMenuMarkerCoordinates(), true)">
+      <mat-icon>add</mat-icon>
+      <span class="menu-label">Ajouter en tant que point d'arrivée</span>
+    </button>    
 
     <button mat-button color="warn" (click)="onDeleteButtonClick(contextMenuMarkerId())">
       <mat-icon>delete</mat-icon>

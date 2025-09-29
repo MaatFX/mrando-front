@@ -229,9 +229,9 @@ export class HikeMapComponent implements AfterViewInit, OnDestroy, OnInit {
     window.addEventListener('click', close);
   }
 
-  onAddButtonClick(coords: [number, number] | null): void {
+  onAddButtonClick(coords: [number, number] | null, atEnd: boolean): void {
     if (!coords) return;
-    this.addPoint(coords);
+    this.addPoint(coords, atEnd);
     this.contextMenuVisible.set(false);
     this.refreshRoute(false);
   }
@@ -267,23 +267,28 @@ export class HikeMapComponent implements AfterViewInit, OnDestroy, OnInit {
     })
 }
 
-  addPoint(coords: [number, number]): void {
+  addPoint(coords: [number, number], atEnd: boolean): void {
     const newPoint: HikePoint = { latitude: coords[0], longitude: coords[1], elevation: 0, index: -1 };
-    let bestIndex = 0, bestDist = Infinity;
 
-    for (let i = 0; i < this.currentHike.points.length - 1; i++) {
-      const projection = this.refugesInfo.projectPointOnSegment(
-        coords,
-        [this.currentHike.points[i].latitude, this.currentHike.points[i].longitude],
-        [this.currentHike.points[i + 1].latitude, this.currentHike.points[i + 1].longitude]
-      );
-      const dist = L.latLng(coords[0], coords[1]).distanceTo(L.latLng(projection[0], projection[1]));
-      if (dist < bestDist) {
-        bestDist = dist;
-        bestIndex = i;
+    if (!atEnd) {
+      let bestIndex = 0, bestDist = Infinity;
+
+      for (let i = 0; i < this.currentHike.points.length - 1; i++) {
+        const projection = this.refugesInfo.projectPointOnSegment(
+          coords,
+          [this.currentHike.points[i].latitude, this.currentHike.points[i].longitude],
+          [this.currentHike.points[i + 1].latitude, this.currentHike.points[i + 1].longitude]
+        );
+        const dist = L.latLng(coords[0], coords[1]).distanceTo(L.latLng(projection[0], projection[1]));
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestIndex = i;
+        }
       }
+      this.currentHike.points.splice(bestIndex + 1, 0, newPoint);
+    } else {
+      this.currentHike.points.push(newPoint)
     }
-    this.currentHike.points.splice(bestIndex + 1, 0, newPoint);
     this.refreshMarkers();
   }
 }
