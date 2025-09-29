@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export type Hike = {
   id: number;
@@ -24,7 +25,7 @@ export type HikePoint = {
 })
 export class HikeService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'api/hikes'; // 👉 à adapter selon ton backend
+  private readonly apiUrl = `${environment.apiUrl}/hikes`
 
   getHikes(): Observable<Hike[]> {
     return this.http.get<Hike[]>(this.apiUrl);

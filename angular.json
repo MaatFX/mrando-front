@@ -35,7 +35,13 @@
             ]
           },
           "configurations": {
-            "production": {
+            "prod": {
+              "fileReplacements": [
+              {
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.prod.ts"
+              }
+              ],
               "budgets": [
                 {
                   "type": "initial",
@@ -50,7 +56,18 @@
               ],
               "outputHashing": "all"
             },
-            "development": {
+            "staging": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+              {
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.staging.ts"
+              }
+              ]
+            },
+            "dev": {
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
@@ -64,17 +81,14 @@
           },
           "builder": "@angular/build:dev-server",
           "configurations": {
-            "production": {
-              "buildTarget": "mrando-front:build:production",
-              "proxyConfig": "./proxy.conf.prod.json"
+            "prod": {
+              "buildTarget": "mrando-front:build:production"
             },
-            "development": {
-              "buildTarget": "mrando-front:build:development",
-              "proxyConfig": "./proxy.conf.dev.json"
+            "dev": {
+              "buildTarget": "mrando-front:build:development"
             },
             "staging": {
-              "buildTarget": "mrando-front:build:development",
-              "proxyConfig": "./proxy.conf.staging.json"
+              "buildTarget": "mrando-front:build:development"
             }
           },
           "defaultConfiguration": "development"
