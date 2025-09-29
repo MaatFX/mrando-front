@@ -65,10 +65,16 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "mrando-front:build:production"
+              "buildTarget": "mrando-front:build:production",
+              "proxyConfig": "./proxy.conf.prod.json"
             },
             "development": {
-              "buildTarget": "mrando-front:build:development"
+              "buildTarget": "mrando-front:build:development",
+              "proxyConfig": "./proxy.conf.dev.json"
+            },
+            "staging": {
+              "buildTarget": "mrando-front:build:development",
+              "proxyConfig": "./proxy.conf.staging.json"
             }
           },
           "defaultConfiguration": "development"
