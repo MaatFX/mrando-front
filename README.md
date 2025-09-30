@@ -1,59 +1,35 @@
-# MrandoFront
+# 🎯 Objectif
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.2.2.
+Application web interactive pour planifier des randonnées : tracer un itinéraire, visualiser le dénivelé, et afficher automatiquement refuges et points d’eau à proximité.
 
-## Development server
+# 🚀 Fonctionnalités principales
 
-To start a local development server, run:
+- Ajout, suppression et déplacement de points de passage
 
-```bash
-ng serve
-```
+- Calcul et affichage de l'itinéraire avec l'API OpenRoute
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Affichage des refuges et points d’eau via l’API Refuges.info
 
-## Code scaffolding
+- Menu contextuel (clic droit) pour gérer le parcours
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- UI avec Angular Material + icônes personnalisées
 
-```bash
-ng generate component component-name
-```
+# 🛠️ Stack technique
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- Angular 20
 
-```bash
-ng generate --help
-```
+- TypeScript
 
-## Building
+- Leaflet.js pour la carte interactive
 
-To build the project run:
+- Angular Material pour l’interface
 
-```bash
-ng build
-```
+- Backend Java Springboot avec BDD PostgreSQL
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+- Docker & CI/CD pour la mise en production
 
-## Running unit tests
+# Aperçu et démo
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+http://demo.mrando.mathieuperdreau.fr/
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+<img width="2531" height="1328" alt="Capture d'écran 2025-09-30 162907" src="https://github.com/user-attachments/assets/678a5b9a-c4b1-4bd2-b726-854329dcad58" />
